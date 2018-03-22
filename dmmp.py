@@ -345,20 +345,18 @@ def mpaths_get():
     Parameters:
         void
     Returns:
-        [DMMP_mpath,]       List of DMMP_mpath objects.
+        DMMP_mpath, ...     Iterable of DMMP_mpath objects.
     """
-    rc = []
     s = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
     s.settimeout(60)
     s.connect(_IPC_ADDR)
     json_str = _ipc_exec(s, "show maps json")
     s.close()
     if len(json_str) == 0:
-        return rc
+        return
     all_data = json.loads(json_str)
     if all_data["major_version"] != _API_VERSION_MAJOR:
         raise exception("incorrect version")
 
     for mpath in all_data["maps"]:
-        rc.append(DMMP_mpath(mpath))
-    return rc
+        yield DMMP_mpath(mpath)

@@ -23,7 +23,7 @@ sys.path.append(os.path.dirname(_CURRENT_DIR))
 
 import dmmp
 
-mpaths = dmmp.mpaths_get()
+mpaths = list(dmmp.mpaths_get())
 print("Got %d paths" % len(mpaths))
 
 for mpath in mpaths:
