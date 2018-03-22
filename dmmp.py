@@ -51,9 +51,9 @@ def _bytes_to_len(len_bytes):
         return int(len_bytes.encode("hex"), 16)
 
 
-class DMMP_path(object):
+class Path(object):
     """
-    DMMP_pathgroup is the abstraction of path in multipath-tools.
+    Path is the abstraction of path in multipath-tools.
     """
     def __init__(self, path):
         """
@@ -61,7 +61,7 @@ class DMMP_path(object):
         """
         for key, value in path.items():
             setattr(self, "_%s" % key, value)
-        self._status = DMMP_path._status_str_to_enum(self._chk_st)
+        self._status = Path._status_str_to_enum(self._chk_st)
 
     STATUS_UNKNOWN = 0
     STATUS_DOWN = 2
@@ -85,33 +85,33 @@ class DMMP_path(object):
 
     @staticmethod
     def _status_str_to_enum(status_str):
-        for key, value in DMMP_path._STATUS_CONV.items():
+        for key, value in Path._STATUS_CONV.items():
             if value == status_str:
                 return key
-        return DMMP_path.STATUS_UNKNOWN
+        return Path.STATUS_UNKNOWN
 
     @staticmethod
     def status_to_str(status):
         """
         Usage:
             Convert status integer to human readable string:
-                DMMP_path.STATUS_UNKNOWN:       "undef"
-                DMMP_path.STATUS_UP:            "ready"
-                DMMP_path.STATUS_DOWN:          "faulty"
-                DMMP_path.STATUS_SHAKY:         "shaky"
-                DMMP_path.STATUS_GHOST:         "ghost"
-                DMMP_path.STATUS_PENDING:       "i/o pending"
-                DMMP_path.STATUS_TIMEOUT:       "i/o timeout"
-                DMMP_path.STATUS_DELAYED:       "delayed"
+                Path.STATUS_UNKNOWN:       "undef"
+                Path.STATUS_UP:            "ready"
+                Path.STATUS_DOWN:          "faulty"
+                Path.STATUS_SHAKY:         "shaky"
+                Path.STATUS_GHOST:         "ghost"
+                Path.STATUS_PENDING:       "i/o pending"
+                Path.STATUS_TIMEOUT:       "i/o timeout"
+                Path.STATUS_DELAYED:       "delayed"
         Parameters:
-            status              Integer. DMMP_path.status
+            status              Integer. Path.status
         Returns:
             status_str          String.
         Exception:
             ValueError          If got illegal status.
         """
         try:
-            return DMMP_path._STATUS_CONV[status]
+            return Path._STATUS_CONV[status]
         except KeyError:
             return ValueError("Invalid path status %d" % status)
 
@@ -126,27 +126,27 @@ class DMMP_path(object):
     def status(self):
         """
         Integer. Status of current path. Possible values are:
-        * DMMP_path.STATUS_UNKNOWN
+        * Path.STATUS_UNKNOWN
             Unknown status.
-        * DMMP_path.STATUS_DOWN
+        * Path.STATUS_DOWN
             Path is down and you shouldn't try to send commands to it.
-        * DMMP_path.STATUS_UP
+        * Path.STATUS_UP
             Path is up and I/O can be sent to it.
-        * DMMP_path.STATUS_SHAKY
+        * Path.STATUS_SHAKY
             Only emc_clariion checker when path not available for "normal"
             operations.
-        * DMMP_path.STATUS_GHOST
+        * Path.STATUS_GHOST
             Only hp_sw and rdac checkers.  Indicates a "passive/standby" path
             on active/passive HP arrays. These paths will return valid answers
             to certain SCSI commands (tur, read_capacity, inquiry, start_stop),
             but will fail I/O commands.
             The path needs an initialization command to be sent to it in order
             for I/Os to succeed.
-        * DMMP_path.STATUS_PENDING
+        * Path.STATUS_PENDING
             Available for all async checkers when a check IO is in flight.
-        * DMMP_path.STATUS_TIMEOUT
+        * Path.STATUS_TIMEOUT
             Only tur checker when command timed out.
-        * DMMP_path.STATUS_DELAYED
+        * Path.STATUS_DELAYED
             If a path fails after being up for less than delay_watch_checks
             checks, when it comes back up again, it will not be marked as up
             until it has been up for delay_wait_checks checks. During this
@@ -155,12 +155,12 @@ class DMMP_path(object):
         return self._status
 
     def __str__(self):
-        return "%s|%s" % (self.blk_name, DMMP_path.status_to_str(self.status))
+        return "%s|%s" % (self.blk_name, Path.status_to_str(self.status))
 
 
-class DMMP_pathgroup(object):
+class PathGroup(object):
     """
-    DMMP_pathgroup is the abstraction of path group in multipath-tools.
+    PathGroup is the abstraction of path group in multipath-tools.
     """
     def __init__(self, pg):
         """
@@ -170,11 +170,11 @@ class DMMP_pathgroup(object):
         for key, value in pg.items():
             if key == "paths":
                 for path in pg["paths"]:
-                    self._paths.append(DMMP_path(path))
+                    self._paths.append(Path(path))
             else:
                 setattr(self, "_%s" % key, value)
 
-        self._status = DMMP_pathgroup._status_str_to_enum(self._dm_st)
+        self._status = PathGroup._status_str_to_enum(self._dm_st)
 
     STATUS_UNKNOWN = 0
     STATUS_ENABLED = 1
@@ -190,29 +190,29 @@ class DMMP_pathgroup(object):
 
     @staticmethod
     def _status_str_to_enum(status_str):
-        for key, value in DMMP_pathgroup._STATUS_CONV.items():
+        for key, value in PathGroup._STATUS_CONV.items():
             if value == status_str:
                 return key
-        return DMMP_pathgroup.STATUS_UNKNOWN
+        return PathGroup.STATUS_UNKNOWN
 
     @staticmethod
     def status_to_str(status):
         """
         Usage:
             Convert status integer to human readable string:
-                DMMP_pathgroup.STATUS_UNKNOWN:       "undef"
-                DMMP_pathgroup.STATUS_ENABLED:       "enabled"
-                DMMP_pathgroup.STATUS_DISABLED:      "disabled"
-                DMMP_pathgroup.STATUS_ACTIVE:        "active"
+                PathGroup.STATUS_UNKNOWN:       "undef"
+                PathGroup.STATUS_ENABLED:       "enabled"
+                PathGroup.STATUS_DISABLED:      "disabled"
+                PathGroup.STATUS_ACTIVE:        "active"
         Parameters:
-            status              Integer. DMMP_pathgroup.status
+            status              Integer. PathGroup.status
         Returns:
             status_str          String.
         Exception:
             ValueError          If got illegal status.
         """
         try:
-            return DMMP_pathgroup._STATUS_CONV[status]
+            return PathGroup._STATUS_CONV[status]
         except KeyError:
             return ValueError("Invalid path group status %d" % status)
 
@@ -228,13 +228,13 @@ class DMMP_pathgroup(object):
     def status(self):
         """
         Integer. Status of current path group. Possible values are:
-        * DMMP_pathgroup.STATUS_UNKNOWN
+        * PathGroup.STATUS_UNKNOWN
             Unknown status
-        * DMMP_pathgroup.STATUS_ENABLED
+        * PathGroup.STATUS_ENABLED
             Standby to be active
-        * DMMP_pathgroup.STATUS_DISABLED
+        * PathGroup.STATUS_DISABLED
             Disabled due to all path down
-        * DMMP_pathgroup.STATUS_ACTIVE
+        * PathGroup.STATUS_ACTIVE
             Selected to handle I/O
         """
         return self._status
@@ -259,18 +259,18 @@ class DMMP_pathgroup(object):
     @property
     def paths(self):
         """
-        List of DMMP_path objects.
+        List of Path objects.
         """
         return self._paths
 
     def __str__(self):
         return "%s|%s|%d" % (
-            self.id, DMMP_pathgroup.status_to_str(self.status), self.priority)
+            self.id, PathGroup.status_to_str(self.status), self.priority)
 
 
-class DMMP_mpath(object):
+class MPath(object):
     """
-    DMMP_mpath is the abstraction of mpath(aka. map) in multipath-tools.
+    MPath is the abstraction of mpath(aka. map) in multipath-tools.
     """
     def __init__(self, mpath):
         """
@@ -280,7 +280,7 @@ class DMMP_mpath(object):
         for key, value in mpath.items():
             if key == "path_groups":
                 for pg in mpath["path_groups"]:
-                    self._path_groups.append(DMMP_pathgroup(pg))
+                    self._path_groups.append(PathGroup(pg))
             else:
                 setattr(self, "_%s" % key, value)
 
@@ -301,14 +301,14 @@ class DMMP_mpath(object):
     @property
     def path_groups(self):
         """
-        List of DMMP_mpath objects.
+        List of MPath objects.
         """
         return self._path_groups
 
     @property
     def paths(self):
         """
-        List of DMMP_path objects
+        List of Path objects
         """
         rc = []
         for pg in self.path_groups:
@@ -345,7 +345,7 @@ def mpaths_get():
     Parameters:
         void
     Returns:
-        DMMP_mpath, ...     Iterable of DMMP_mpath objects.
+        MPath, ...     Iterable of MPath objects.
     """
     s = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
     s.settimeout(60)
@@ -359,4 +359,4 @@ def mpaths_get():
         raise exception("incorrect version")
 
     for mpath in all_data["maps"]:
-        yield DMMP_mpath(mpath)
+        yield MPath(mpath)
