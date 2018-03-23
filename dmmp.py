@@ -59,9 +59,8 @@ class Path(object):
         """
         Internal function. For mpaths_get() only.
         """
-        for key, value in path.items():
-            setattr(self, "_%s" % key, value)
-        self._status = Path._status_str_to_enum(self._chk_st)
+        self._dev = path["dev"]
+        self._status = Path._status_str_to_enum(path["chk_st"])
 
     STATUS_UNKNOWN = 0
     STATUS_DOWN = 2
@@ -166,15 +165,11 @@ class PathGroup(object):
         """
         Internal function. For mpaths_get() only.
         """
-        self._paths = []
-        for key, value in pg.items():
-            if key == "paths":
-                for path in pg["paths"]:
-                    self._paths.append(Path(path))
-            else:
-                setattr(self, "_%s" % key, value)
-
-        self._status = PathGroup._status_str_to_enum(self._dm_st)
+        self._paths = [Path(path) for path in pg["paths"]]
+        self._group = pg["group"]
+        self._pri = pg["pri"]
+        self._selector = pg["selector"]
+        self._status = PathGroup._status_str_to_enum(pg["dm_st"])
 
     STATUS_UNKNOWN = 0
     STATUS_ENABLED = 1
@@ -276,13 +271,10 @@ class MPath(object):
         """
         Internal function. For mpaths_get() only.
         """
-        self._path_groups = []
-        for key, value in mpath.items():
-            if key == "path_groups":
-                for pg in mpath["path_groups"]:
-                    self._path_groups.append(PathGroup(pg))
-            else:
-                setattr(self, "_%s" % key, value)
+        self._path_groups = [PathGroup(pg) for pg in mpath["path_groups"]]
+        self._uuid = mpath["uuid"]
+        self._name = mpath["name"]
+        self._sysfs = mpath["sysfs"]
 
     @property
     def wwid(self):
