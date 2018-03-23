@@ -65,7 +65,7 @@ class Path(object):
         Internal function. For mpaths_get() only.
         """
         self._dev = path["dev"]
-        self._status = Path._status_str_to_enum(path["chk_st"])
+        self._status = self._status_str_to_enum(path["chk_st"])
 
     STATUS_UNKNOWN = 0
     STATUS_DOWN = 2
@@ -89,34 +89,8 @@ class Path(object):
 
     _add_reverse_mapping(_STATUS_CONV)
 
-    @staticmethod
-    def _status_str_to_enum(status_str):
-        return Path._STATUS_CONV.get(status_str, Path.STATUS_UNKNOWN)
-
-    @staticmethod
-    def status_to_str(status):
-        """
-        Usage:
-            Convert status integer to human readable string:
-                Path.STATUS_UNKNOWN:       "undef"
-                Path.STATUS_UP:            "ready"
-                Path.STATUS_DOWN:          "faulty"
-                Path.STATUS_SHAKY:         "shaky"
-                Path.STATUS_GHOST:         "ghost"
-                Path.STATUS_PENDING:       "i/o pending"
-                Path.STATUS_TIMEOUT:       "i/o timeout"
-                Path.STATUS_DELAYED:       "delayed"
-        Parameters:
-            status              Integer. Path.status
-        Returns:
-            status_str          String.
-        Exception:
-            ValueError          If got illegal status.
-        """
-        try:
-            return Path._STATUS_CONV[status]
-        except KeyError:
-            return ValueError("Invalid path status %d" % status)
+    def _status_str_to_enum(self, status_str):
+        return self._STATUS_CONV.get(status_str, self.STATUS_UNKNOWN)
 
     @property
     def blk_name(self):
@@ -157,8 +131,31 @@ class Path(object):
         """
         return self._status
 
+    @property
+    def status_string(self):
+        """
+        String. Status of current path. Possible values are:
+        * "undef"
+            Path.STATUS_UNKNOWN
+        * "faulty"
+            Path.STATUS_DOWN
+        * "ready"
+            Path.STATUS_UP
+        * "shaky"
+            Path.STATUS_SHAKY
+        * "ghost"
+            Path.STATUS_GHOST
+        * "i/o pending"
+            Path.STATUS_PENDING
+        * "i/o timeout"
+            Path.STATUS_TIMEOUT
+        * "delayed"
+            Path.STATUS_DELAYED
+        """
+        return self._STATUS_CONV[self._status]
+
     def __str__(self):
-        return "%s|%s" % (self.blk_name, Path.status_to_str(self.status))
+        return "%s|%s" % (self.blk_name, self.status_string)
 
 
 class PathGroup(object):
@@ -173,7 +170,7 @@ class PathGroup(object):
         self._group = pg["group"]
         self._pri = pg["pri"]
         self._selector = pg["selector"]
-        self._status = PathGroup._status_str_to_enum(pg["dm_st"])
+        self._status = self._status_str_to_enum(pg["dm_st"])
 
     STATUS_UNKNOWN = 0
     STATUS_ENABLED = 1
@@ -189,30 +186,8 @@ class PathGroup(object):
 
     _add_reverse_mapping(_STATUS_CONV)
 
-    @staticmethod
-    def _status_str_to_enum(status_str):
-        return PathGroup._STATUS_CONV.get(status_str, PathGroup.STATUS_UNKNOWN)
-
-    @staticmethod
-    def status_to_str(status):
-        """
-        Usage:
-            Convert status integer to human readable string:
-                PathGroup.STATUS_UNKNOWN:       "undef"
-                PathGroup.STATUS_ENABLED:       "enabled"
-                PathGroup.STATUS_DISABLED:      "disabled"
-                PathGroup.STATUS_ACTIVE:        "active"
-        Parameters:
-            status              Integer. PathGroup.status
-        Returns:
-            status_str          String.
-        Exception:
-            ValueError          If got illegal status.
-        """
-        try:
-            return PathGroup._STATUS_CONV[status]
-        except KeyError:
-            return ValueError("Invalid path group status %d" % status)
+    def _status_str_to_enum(self, status_str):
+        return self._STATUS_CONV.get(status_str, self.STATUS_UNKNOWN)
 
     @property
     def id(self):
@@ -236,6 +211,21 @@ class PathGroup(object):
             Selected to handle I/O
         """
         return self._status
+
+    @property
+    def status_string(self):
+        """
+        String. Status of current path group. Possible values are:
+        * "undef"
+            PathGroup.STATUS_UNKNOWN
+        * "enabled"
+            PathGroup.STATUS_ENABLED
+        * "disabled"
+            PathGroup.STATUS_DISABLED
+        * "active"
+            PathGroup.STATUS_ACTIVE
+        """
+        return self._STATUS_CONV[self._status]
 
     @property
     def priority(self):
@@ -263,7 +253,7 @@ class PathGroup(object):
 
     def __str__(self):
         return "%s|%s|%d" % (
-            self.id, PathGroup.status_to_str(self.status), self.priority)
+            self.id, self.status_string, self.priority)
 
 
 class MPath(object):
