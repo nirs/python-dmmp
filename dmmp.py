@@ -51,6 +51,11 @@ def _bytes_to_len(len_bytes):
         return int(len_bytes.encode("hex"), 16)
 
 
+def _add_reverse_mapping(d):
+    for k, v in d.items():
+        d[v] = k
+
+
 class Path(object):
     """
     Path is the abstraction of path in multipath-tools.
@@ -82,12 +87,11 @@ class Path(object):
         STATUS_DELAYED: "delayed",
     }
 
+    _add_reverse_mapping(_STATUS_CONV)
+
     @staticmethod
     def _status_str_to_enum(status_str):
-        for key, value in Path._STATUS_CONV.items():
-            if value == status_str:
-                return key
-        return Path.STATUS_UNKNOWN
+        return Path._STATUS_CONV.get(status_str, Path.STATUS_UNKNOWN)
 
     @staticmethod
     def status_to_str(status):
@@ -183,12 +187,11 @@ class PathGroup(object):
         STATUS_ACTIVE: "active",
     }
 
+    _add_reverse_mapping(_STATUS_CONV)
+
     @staticmethod
     def _status_str_to_enum(status_str):
-        for key, value in PathGroup._STATUS_CONV.items():
-            if value == status_str:
-                return key
-        return PathGroup.STATUS_UNKNOWN
+        return PathGroup._STATUS_CONV.get(status_str, PathGroup.STATUS_UNKNOWN)
 
     @staticmethod
     def status_to_str(status):
